@@ -1,8 +1,8 @@
 <?php
-ini_set('display_errors',1);
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); //toon alle fouten behalve notices en warnings	
-setlocale(LC_MONETARY, 'nl_NL.UTF-8');	
-setlocale(LC_TIME, 'nl_NL.UTF-8');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+setlocale(LC_ALL, array('Dutch_Netherlands', 'Dutch', 'nl_NL', 'nl', 'nl_NL.ISO8859-1'));
 date_default_timezone_set('Europe/Amsterdam');
 @include_once('../dev/db.php');
 $groep="ao";
@@ -108,8 +108,8 @@ $lessen = $query->fetchAll(PDO::FETCH_ASSOC);
 		}
 		if(!is_null($les['opg_opgaven']))
 		{
-			echo "<tr><td class='text-right' colspan='2'><a href='#' onclick=\"editOpgave({$les['opg_id']})\"><i class='fas fa-edit'></i></a></td><td colspan='3'>{$les['opg_opgaven']}</td>";
-			echo "<td colspan='4'><a href='{$les['opg_url']}' target='_blank'>{$les['opg_url']}</a></td>";
+			echo "<tr><td class='text-right' colspan='2'><a href='#' onclick=\"editOpgave({$les['opg_id']})\"><i class='fas fa-edit'></i></a></td><td colspan='4'>{$les['opg_opgaven']}</td>";
+			echo "<td colspan='3'><a href='{$les['opg_url']}' target='_blank'>{$les['opg_url']}</a></td>";
 			echo "</tr>";
 		}	
 	}

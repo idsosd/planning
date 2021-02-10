@@ -8,8 +8,7 @@ if ($action=='select')
 	$sql="SELECT * FROM lessen WHERE les_id=:id";
 	$query = $dbconnect -> prepare($sql);
 	$query->bindParam(":id", $_POST['les_id']);
-	$query ->execute();	
-		
+	$query ->execute();
 	$les=$query->fetchAll(PDO::FETCH_ASSOC);
 	//$returnstmt="<pre>".print_r($les)."</pre>";
 	$returnstmt="<form id='lesform' onsubmit=\"updateLes(".$les[0]['les_id'].");return false;\">";
@@ -44,9 +43,7 @@ if ($action=='select')
 }
 elseif($action=="update")
 {
-	if(dbConnect())
-	{
-		$sql="UPDATE lessen SET 
+    $sql="UPDATE lessen SET 
 		les_behlesnr=:lesnrbeh, 
 		les_behdatum=:datumbeh, 
 		les_aolesnr=:lesnrao, 
@@ -54,8 +51,15 @@ elseif($action=="update")
 		les_methode=:docent, 
 		les_doel=:doel 
 		WHERE les_id=:id";
-		dbQuery($sql,[':lesnrbeh'=>$_POST['behlesnr'],':datumbeh'=>$_POST['behdatum'],':lesnrao'=>$_POST['aolesnr'],':datumao'=>$_POST['aodatum'],':docent'=>$_POST['docent'],':doel'=>$_POST['lesdoel'],':id'=>$_POST['lesid']]);
-	}
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":lesnrbeh", $_POST['behlesnr']);
+    $query->bindParam(":datumbeh", $_POST['behdatum']);
+    $query->bindParam(":lesnrao", $_POST['aolesnr']);
+    $query->bindParam(":datumao", $_POST['aodatum']);
+    $query->bindParam(":docent", $_POST['docent']);
+    $query->bindParam(":doel", $_POST['lesdoel']);
+    $query->bindParam(":id", $_POST['lesid']);
+    $query ->execute();
 }
 elseif($action=="insert")
 {
@@ -67,63 +71,56 @@ elseif($action=="insert")
 }
 elseif ($action=='select_opg')
 {
-	if(dbConnect())
-	{
-		$sql="SELECT * FROM opgaven WHERE opg_id=:id";
-		//$paramaters=array(':id' => $_POST['opg_id']);
-		dbQuery($sql,[':id'=>$_POST['opg_id']]);
-		
-		$les=dbGetAll();
-		//$returnstmt="<pre>".print_r($les)."</pre>";
-		$returnstmt="<form id='opgform' onsubmit=\"updateOpg(".$les[0]['opg_id'].");return false;\">";
-		$returnstmt.="<div class='form-group'>";
-		$returnstmt.="<label for='opgave'>Opgave(n)</label>";
-		$returnstmt.="<textarea id='opgave' class='form-control'>".$les[0]['opg_opgaven']."</textarea>";
-		$returnstmt.="</div>";
-		$returnstmt.="<div class='form-group'>";
-		$returnstmt.="<label for='opg_url'>Math4All-link</label>";
-		$returnstmt.="<textarea id='opg_url' class='form-control'>".$les[0]['opg_url']."</textarea>";
-		$returnstmt.="</div>";
-		$returnstmt.="</form>";
-	}
+    $sql="SELECT * FROM opgaven WHERE opg_id=:id";
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":id", $_POST['opg_id']);
+    $query ->execute();
+    $les = $query->fetchAll(PDO::FETCH_ASSOC);
+    $returnstmt="<form id='opgform' onsubmit=\"updateOpg(".$les[0]['opg_id'].");return false;\">";
+    $returnstmt.="<div class='form-group'>";
+    $returnstmt.="<label for='opgave'>Opgave(n)</label>";
+    $returnstmt.="<textarea id='opgave' class='form-control'>".$les[0]['opg_opgaven']."</textarea>";
+    $returnstmt.="</div>";
+    $returnstmt.="<div class='form-group'>";
+    $returnstmt.="<label for='opg_url'>Math4All-link</label>";
+    $returnstmt.="<textarea id='opg_url' class='form-control'>".$les[0]['opg_url']."</textarea>";
+    $returnstmt.="</div>";
+    $returnstmt.="</form>";
 	echo json_encode($returnstmt);
 }
 elseif($action=="insert_opg")
 {
-	if(dbConnect())
-	{
-		$sql="INSERT INTO opgaven (opg_les_id, opg_opgaven, opg_url) VALUES (:id, :opg, :url)";
-		dbQuery($sql,[':id'=>$_POST['les_id'], ':opg'=>$_POST['opg'],':url'=>$_POST['url']]);
-	}
+    $sql="INSERT INTO opgaven (opg_les_id, opg_opgaven, opg_url) VALUES (:id, :opg, :url)";
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":id", $_POST['les_id']);
+    $query->bindParam(":opg", $_POST['opg']);
+    $query->bindParam(":url", $_POST['url']);
+    $query ->execute();
 }
 
 elseif($action=="delete")
 {
-	if(dbConnect())
-	{
-		$sql="DELETE FROM lessen WHERE les_id=:lesid";
-		dbQuery($sql,array(':lesid'=>$_POST['les_id']));
-	}
+    $sql="DELETE FROM lessen WHERE les_id=:lesid";
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":lesid", $_POST['les_id']);
+    $query ->execute();
 }
 
 elseif($action=="delete_opg")
 {
-	if(dbConnect())
-	{
-		$sql="DELETE FROM opgaven WHERE opg_id=:opgid";
-		dbQuery($sql,array(':opgid'=>$_POST['opg_id']));
-	}
+    $sql="DELETE FROM opgaven WHERE opg_id=:opgid";
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":opgid", $_POST['opg_id']);
+    $query ->execute();
 }
 
 elseif($action=="update_opg")
 {
-	if(dbConnect())
-	{
-		$sql="UPDATE opgaven SET 
-		opg_opgaven=:opgave, 
-		opg_url=:opgurl
-		WHERE opg_id=:id";
-		dbQuery($sql,[':opgave'=>$_POST['opg_tekst'],':opgurl'=>$_POST['opg_url'],':id'=>$_POST['opg_id']]);
-	}
+    $sql="UPDATE opgaven SET opg_opgaven=:opgave, opg_url=:opgurl WHERE opg_id=:id";
+    $query = $dbconnect -> prepare($sql);
+    $query->bindParam(":opgave", $_POST['opg_tekst']);
+    $query->bindParam(":opgurl", $_POST['opg_url']);
+    $query->bindParam(":id", $_POST['opg_id']);
+    $query ->execute();
 }
 ?>

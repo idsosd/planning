@@ -1,29 +1,28 @@
 <?php
-ini_set('display_errors',1);
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); //toon alle fouten behalve notices en warnings	
-setlocale(LC_MONETARY, 'nl_NL.UTF-8');	
-setlocale(LC_TIME, 'nl_NL.UTF-8');
-date_default_timezone_set('Europe/Amsterdam');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+setlocale(LC_ALL, array('Dutch_Netherlands', 'Dutch', 'nl_NL', 'nl', 'nl_NL.ISO8859-1'));
 @include_once('dev/db.php');
 $groep="ao";
-$groepdispl="AO";
+$groepdispl="SD";
 if(isset($_GET['groep']))
 	$groep=$_GET['groep'];
 if($groep=="beh")
 	$groepdispl="Beheer";
 
-$vakid=1;
+$vakid=2;
 if(isset($_GET['vakid']))
 	$vakid=$_GET['vakid'];
 
 $dbconnect = new dbconnection();
-$sql="SELECT * FROM lessen LEFT OUTER JOIN opgaven ON les_id = opg_les_id WHERE les_vakid=:vakid ORDER BY les_".$groep."datum";
+$sql="SELECT * FROM vakken, lessen LEFT OUTER JOIN opgaven ON les_id = opg_les_id WHERE les_vakid=:vakid AND vak_id=les_vakid ORDER BY les_".$groep."datum";
 $query = $dbconnect -> prepare($sql);
 $query->bindParam(":vakid", $vakid);
 $query ->execute();
 $lessen = $query -> fetchAll(PDO::FETCH_ASSOC);
 	
-	?>
+?>
 <!DOCTYPE html>
 <html lang="nl">
   <head>
@@ -39,7 +38,7 @@ $lessen = $query -> fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">	
 	
-<h1>Wiskundeplanning <?= $groepdispl ?>-groepen (OSD)	</h1>
+<h1><?= $lessen[0]['vak_naam'] ?>-planning <?= $groepdispl ?>-groepen (OSD)	</h1>
 <div class="table-responsive-xl">
 <table class="table table-hover">
 	<thead class="thead-dark">
@@ -60,16 +59,22 @@ $lessen = $query -> fetchAll(PDO::FETCH_ASSOC);
 		{
 			$lesnr=$les['les_'.$groep.'lesnr'];
 			$datum=strftime('%a %e %h' , strtotime($les['les_'.$groep.'datum']));
-			$methode=nl2br($les['les_methode']);
-			$aandeslag="<a href='".$les['opg_url']."' target='_blank'>".$les['opg_opgaven']."</a>";
-			$doel=nl2br($les['les_doel']);
+			$methode=$les['les_methode'];
+			if($les['opg_url']<>"")
+			    $aandeslag="<li><a href='".$les['opg_url']."' target='_blank'>".$les['opg_opgaven']."</a></li>";
+			else
+                $aandeslag="<li>{$les['opg_opgaven']}</li>";
+			$doel=$les['les_doel'];
 			$vorigelesnr=$lesnr;
 		}
 		else
 		{
 			if($les['les_'.$groep.'lesnr']==$vorigelesnr)
 			{
-				$aandeslag.="<br><a href='".$les['opg_url']."' target='_blank'>".$les['opg_opgaven']."</a>";
+                if($les['opg_url']<>"")
+			        $aandeslag.="<li><a href='".$les['opg_url']."' target='_blank'>".$les['opg_opgaven']."</a></li>";
+                else
+                    $aandeslag.="<li>{$les['opg_opgaven']}</li>";
 			}
 			else
 			{
@@ -77,7 +82,7 @@ $lessen = $query -> fetchAll(PDO::FETCH_ASSOC);
 				echo "<td class='text-right' width='75'>Les ".$lesnr."</td>";
 				echo "<td width='100'>".$datum."</td>";
 				echo "<td width='250'>".$methode."</td>";
-				echo "<td width='250'>".$aandeslag."</td>";
+				echo "<td width='250'><ol>".$aandeslag."</ol></td>";
 				echo "<td>".$doel."</td></tr>";
 				$lesnr=$les['les_'.$groep.'lesnr'];
 				$datum=strftime('%a %e %h' , strtotime($les['les_'.$groep.'datum']));
@@ -93,7 +98,7 @@ $lessen = $query -> fetchAll(PDO::FETCH_ASSOC);
 	echo "<td class='text-right' width='75'>Les ".$lesnr."</td>";
 	echo "<td width='100'>".$datum."</td>";
 	echo "<td width='250'>".$methode."</td>";
-	echo "<td width='250'>".$aandeslag."</td>";
+	echo "<td width='250'><ol>".$aandeslag."</ol></td>";
 	echo "<td>".$doel."</td></tr>";
 	?>
 </table>
